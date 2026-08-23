@@ -1,0 +1,14 @@
+{
+  "name": "mytownapp",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:web": "npm run dev -w @mytownapp/web",
+    "dev:native": "npm run start -w @mytownapp/native",
+    "build": "npm run build -w @mytownapp/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": { "node": ">=22" }
+}

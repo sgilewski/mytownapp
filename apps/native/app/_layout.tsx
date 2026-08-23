@@ -1,0 +1,4 @@
+import { Tabs } from "expo-router";
+import { CalendarDays, Heart, Home, UserRound } from "lucide-react-native";
+import { brand } from "@mytownapp/design";
+export default function RootLayout(){return <Tabs screenOptions={{headerShown:false,tabBarActiveTintColor:brand.colors.green,tabBarInactiveTintColor:brand.colors.muted,tabBarStyle:{height:84,paddingTop:9,borderTopColor:brand.colors.line},tabBarLabelStyle:{fontSize:11,fontWeight:"700",paddingBottom:9}}}><Tabs.Screen name="index" options={{title:"Home",tabBarIcon:({color})=><Home color={color} size={22}/>}}/><Tabs.Screen name="events" options={{title:"Events",tabBarIcon:({color})=><CalendarDays color={color} size={22}/>}}/><Tabs.Screen name="saved" options={{title:"Saved",tabBarIcon:({color})=><Heart color={color} size={22}/>}}/><Tabs.Screen name="account" options={{title:"Account",tabBarIcon:({color})=><UserRound color={color} size={22}/>}}/></Tabs>}

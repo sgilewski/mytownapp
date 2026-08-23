@@ -1,0 +1,1 @@
+{"expo":{"name":"mytownapp","slug":"mytownapp","scheme":"mytownapp","version":"0.1.0","orientation":"portrait","userInterfaceStyle":"light","plugins":["expo-router"],"experiments":{"typedRoutes":true},"ios":{"supportsTablet":true,"bundleIdentifier":"com.mytownapp.mobile"},"android":{"package":"com.mytownapp.mobile"}}}
