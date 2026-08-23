@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { CalendarPlus,MailPlus } from "lucide-react";
-import { setEventStatus } from "@/app/actions/resources";
+import { CalendarPlus,MailPlus,Megaphone } from "lucide-react";
+import { setAnnouncementStatus,setEventStatus } from "@/app/actions/resources";
 import { DashboardShell } from "@/components/dashboard";
 import { StatusAction } from "@/components/status-action";
 import { getChamberDashboard } from "@/lib/dashboard-data";
 
 export default async function ChamberDashboard(){
-  const {metrics,businesses,events,invitations,isDemo}=await getChamberDashboard();
+  const {metrics,businesses,events,invitations,announcements,isDemo}=await getChamberDashboard();
   return <DashboardShell kind="chamber" metrics={metrics}>
     <div className="dashboard-grid"><section className="panel feature"><div className="panel-heading"><div><p className="eyebrow">Community pulse</p><h2>{isDemo?"Hillside is showing up.":`${businesses.length} local businesses connected.`}</h2></div></div><p>Invite local owners, publish events, and keep residents connected to what is happening nearby.</p><Link className="primary" href="/chamber/invitations/new"><MailPlus size={17}/> Invite a business</Link></section>
       <section className="panel"><div className="panel-heading"><div><p className="eyebrow">Upcoming</p><h2>Events at a glance</h2></div><Link className="secondary" href="/chamber/events/new"><CalendarPlus size={16}/> Add event</Link></div>
@@ -16,6 +16,9 @@ export default async function ChamberDashboard(){
       {businesses.map(b=><div className="business-row" key={b.id}><div className="avatar">{b.name.split(" ").map((x:string)=>x[0]).join("").slice(0,2)}</div><b>{b.name}</b><span className="status">{"status" in b?String(b.status):"published"}</span><small>Business</small></div>)}
       {invitations.map(i=><div className="business-row" key={i.id}><div className="avatar">@</div><b>{i.email}</b><span className="status pending">{i.status}</span><small>Invitation</small></div>)}
       {!businesses.length&&!invitations.length?<p className="empty-copy">Invite the first business to join this town.</p>:null}
+    </section>
+    <section className="panel activity" id="announcements"><div className="panel-heading"><div><p className="eyebrow">Town updates</p><h2>Announcements</h2></div><Link className="secondary" href="/chamber/announcements/new"><Megaphone size={16}/> New announcement</Link></div>
+      {announcements.length?announcements.map(a=><div className="activity-row" key={a.id}><div className="activity-icon">!</div><span><b>{a.title}</b><small>{a.status} · starts {new Date(a.starts_at).toLocaleDateString()}</small></span>{isDemo?null:<StatusAction action={setAnnouncementStatus} id={a.id} status={a.status==="published"?"archived":"published"} label={a.status==="published"?"Archive":"Publish"}/>}</div>):<p className="empty-copy">Share the first update with your town.</p>}
     </section>
   </DashboardShell>
 }
