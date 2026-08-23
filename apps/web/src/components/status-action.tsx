@@ -1,0 +1,1 @@
+export function StatusAction({action,id,status,label}:{action:(formData:FormData)=>void|Promise<void>;id:string;status:string;label:string}){return <form action={action}><input type="hidden" name="id" value={id}/><input type="hidden" name="status" value={status}/><button className="text-action" type="submit">{label}</button></form>}

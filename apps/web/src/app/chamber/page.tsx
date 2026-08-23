@@ -1,5 +1,21 @@
 import Link from "next/link";
-import { chamberMetrics,demoEvents } from "@mytownapp/core";
 import { CalendarPlus,MailPlus } from "lucide-react";
+import { setEventStatus } from "@/app/actions/resources";
 import { DashboardShell } from "@/components/dashboard";
-export default function ChamberDashboard(){return <DashboardShell kind="chamber" metrics={chamberMetrics}><div className="dashboard-grid"><section className="panel feature"><div className="panel-heading"><div><p className="eyebrow">Community pulse</p><h2>Hillside is showing up.</h2></div></div><p>Member activity is up 14% over the last 30 days. Keep the momentum going with a new business invite.</p><button className="primary"><MailPlus size={17}/> Invite a business</button></section><section className="panel"><div className="panel-heading"><div><p className="eyebrow">Upcoming</p><h2>Events at a glance</h2></div><Link className="secondary" href="/chamber/events/new"><CalendarPlus size={16}/> Add event</Link></div>{demoEvents.map(event=><div className="event" key={event.id}><time><b>{new Date(event.startsAt).toLocaleDateString("en-US",{month:"short"}).toUpperCase()}</b><strong>{new Date(event.startsAt).getDate()}</strong></time><span><b>{event.title}</b><small>{event.venue}</small></span></div>)}</section></div><section className="panel activity"><div className="panel-heading"><div><p className="eyebrow">Business network</p><h2>Participation</h2></div><a href="#businesses">View all businesses →</a></div>{[["Birch & Main","Active","4 offers"],["Foundry Coffee","Invited","Sent yesterday"],["Trailhead Outfitters","Active","2 offers"]].map(row=><div className="business-row" key={row[0]}><div className="avatar">{row[0].split(" ").map(x=>x[0]).join("").slice(0,2)}</div><b>{row[0]}</b><span className={row[1]==="Active"?"status":"status pending"}>{row[1]}</span><small>{row[2]}</small></div>)}</section></DashboardShell>}
+import { StatusAction } from "@/components/status-action";
+import { getChamberDashboard } from "@/lib/dashboard-data";
+
+export default async function ChamberDashboard(){
+  const {metrics,businesses,events,invitations,isDemo}=await getChamberDashboard();
+  return <DashboardShell kind="chamber" metrics={metrics}>
+    <div className="dashboard-grid"><section className="panel feature"><div className="panel-heading"><div><p className="eyebrow">Community pulse</p><h2>{isDemo?"Hillside is showing up.":`${businesses.length} local businesses connected.`}</h2></div></div><p>Invite local owners, publish events, and keep residents connected to what is happening nearby.</p><Link className="primary" href="/chamber/invitations/new"><MailPlus size={17}/> Invite a business</Link></section>
+      <section className="panel"><div className="panel-heading"><div><p className="eyebrow">Upcoming</p><h2>Events at a glance</h2></div><Link className="secondary" href="/chamber/events/new"><CalendarPlus size={16}/> Add event</Link></div>
+        {events.length?events.map(e=>{const startsAt="starts_at" in e?e.starts_at:e.startsAt;const status="status" in e?String(e.status):"published";return <div className="event" key={e.id}><time><b>{new Date(startsAt).toLocaleDateString("en-US",{month:"short"}).toUpperCase()}</b><strong>{new Date(startsAt).getDate()}</strong></time><span><b>{e.title}</b><small>{e.venue} · {status}</small></span>{isDemo?null:<StatusAction action={setEventStatus} id={e.id} status={status==="published"?"archived":"published"} label={status==="published"?"Archive":"Publish"}/>}</div>}):<p className="empty-copy">No events have been added yet.</p>}
+      </section></div>
+    <section className="panel activity"><div className="panel-heading"><div><p className="eyebrow">Business network</p><h2>Participation and invitations</h2></div></div>
+      {businesses.map(b=><div className="business-row" key={b.id}><div className="avatar">{b.name.split(" ").map((x:string)=>x[0]).join("").slice(0,2)}</div><b>{b.name}</b><span className="status">{"status" in b?String(b.status):"published"}</span><small>Business</small></div>)}
+      {invitations.map(i=><div className="business-row" key={i.id}><div className="avatar">@</div><b>{i.email}</b><span className="status pending">{i.status}</span><small>Invitation</small></div>)}
+      {!businesses.length&&!invitations.length?<p className="empty-copy">Invite the first business to join this town.</p>:null}
+    </section>
+  </DashboardShell>
+}
