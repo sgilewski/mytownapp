@@ -1,0 +1,17 @@
+create index announcements_chamber_id_idx on public.announcements(chamber_id);
+create index announcements_town_id_idx on public.announcements(town_id);
+create index business_favorites_business_id_idx on public.business_favorites(business_id);
+create index chambers_town_id_idx on public.chambers(town_id);
+create index events_chamber_id_idx on public.events(chamber_id);
+create index events_town_id_idx on public.events(town_id);
+create index invitations_business_id_idx on public.invitations(business_id);
+create index invitations_chamber_id_idx on public.invitations(chamber_id);
+create index invitations_invited_by_idx on public.invitations(invited_by);
+create index memberships_business_id_idx on public.memberships(business_id);
+create index memberships_chamber_id_idx on public.memberships(chamber_id);
+create index offer_saves_offer_id_idx on public.offer_saves(offer_id);
+create index offers_business_id_idx on public.offers(business_id);
+create index redemptions_offer_id_idx on public.redemptions(offer_id);
+create index redemptions_user_id_idx on public.redemptions(user_id);
+create index redemptions_verified_by_idx on public.redemptions(verified_by);
+create index user_towns_town_id_idx on public.user_towns(town_id);

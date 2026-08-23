@@ -1,0 +1,1 @@
+export default function Unauthorized(){return <main className="welcome"><p className="eyebrow">Access limited</p><h1>This workspace isn’t<br/><em>on your account yet.</em></h1><p className="lede">Ask the business or chamber administrator to send you an invitation.</p><a className="primary" href="/login">Return to sign in</a></main>}
