@@ -1,0 +1,5 @@
+import { DashboardShell } from "@/components/dashboard";
+import { DashboardPageIntro,EmptyState,RolePill } from "@/components/dashboard-list";
+import { getChamberDashboard } from "@/lib/dashboard-data";
+
+export default async function ChamberTeamPage(){const data=await getChamberDashboard();return <DashboardShell kind="chamber" active="team" metrics={[]} workspaceName={data.workspaceName} userName={data.userName} title="Team"><section className="panel activity"><DashboardPageIntro eyebrow="Access" title="Chamber roles" description="Review the roles currently attached to your account."/>{data.memberships.length?data.memberships.map((m,index)=><div className="business-row" key={`${m.role}-${index}`}><div className="avatar">{data.userName.slice(0,2).toUpperCase()}</div><b>{data.userName}</b><RolePill role={m.role}/><small>{m.chamber_id?"Chamber access":"Global access"}</small></div>):<EmptyState title="Demo account" description="Team members will appear after this workspace is connected to Supabase."/>}</section></DashboardShell>}

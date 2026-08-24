@@ -1,0 +1,8 @@
+import { Plus } from "lucide-react";
+import { setOfferStatus } from "@/app/actions/resources";
+import { DashboardShell } from "@/components/dashboard";
+import { DashboardPageIntro,EmptyState } from "@/components/dashboard-list";
+import { StatusAction } from "@/components/status-action";
+import { getBusinessDashboard } from "@/lib/dashboard-data";
+
+export default async function OffersPage(){const data=await getBusinessDashboard();return <DashboardShell kind="business" active="offers" metrics={data.metrics} workspaceName={data.workspaceName} userName={data.userName} title="Offers"><section className="panel activity"><DashboardPageIntro eyebrow="Promotions" title="Scheduled and active offers" description="Publish timely reasons for residents to shop local." action={{href:"/business/offers/new",label:"New offer",icon:Plus}}/>{data.offers.length?data.offers.map(o=>{const startsAt="starts_at" in o?o.starts_at:o.startsAt;const endsAt="ends_at" in o?o.ends_at:o.endsAt;return <div className="activity-row" key={o.id}><div className="activity-icon">%</div><span><b>{o.title}</b><small>{o.status} · {new Date(startsAt).toLocaleDateString()}–{new Date(endsAt).toLocaleDateString()}</small></span>{data.isDemo?<strong>Preview</strong>:<StatusAction action={setOfferStatus} id={o.id} status={o.status==="published"?"archived":"published"} label={o.status==="published"?"Archive":"Publish"}/>}</div>}):<EmptyState title="Create your first offer" description="Draft an offer now and publish it when you are ready." action={{href:"/business/offers/new",label:"Create offer"}}/>}</section></DashboardShell>}

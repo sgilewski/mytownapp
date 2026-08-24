@@ -1,0 +1,8 @@
+import { CalendarPlus } from "lucide-react";
+import { setEventStatus } from "@/app/actions/resources";
+import { DashboardShell } from "@/components/dashboard";
+import { DashboardPageIntro,EmptyState } from "@/components/dashboard-list";
+import { StatusAction } from "@/components/status-action";
+import { getChamberDashboard } from "@/lib/dashboard-data";
+
+export default async function ChamberEventsPage(){const data=await getChamberDashboard();return <DashboardShell kind="chamber" active="events" metrics={data.metrics} workspaceName={data.workspaceName} userName={data.userName} title="Events"><section className="panel activity"><DashboardPageIntro eyebrow="Community calendar" title="Upcoming events" description="Create and publish gatherings residents can discover in the mobile app." action={{href:"/chamber/events/new",label:"Add event",icon:CalendarPlus}}/>{data.events.length?data.events.map(e=>{const startsAt="starts_at" in e?e.starts_at:e.startsAt;const status="status" in e?String(e.status):"published";return <div className="event" key={e.id}><time><b>{new Date(startsAt).toLocaleDateString("en-US",{month:"short"}).toUpperCase()}</b><strong>{new Date(startsAt).getDate()}</strong></time><span><b>{e.title}</b><small>{e.venue} · {status}</small></span>{data.isDemo?null:<StatusAction action={setEventStatus} id={e.id} status={status==="published"?"archived":"published"} label={status==="published"?"Archive":"Publish"}/>}</div>}):<EmptyState title="No events yet" description="Add a community event and publish it when the details are ready." action={{href:"/chamber/events/new",label:"Add event"}}/>}</section></DashboardShell>}

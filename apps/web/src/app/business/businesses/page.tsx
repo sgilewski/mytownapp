@@ -1,0 +1,6 @@
+import Link from "next/link";
+import { DashboardShell } from "@/components/dashboard";
+import { DashboardPageIntro,EmptyState } from "@/components/dashboard-list";
+import { getBusinessDashboard } from "@/lib/dashboard-data";
+
+export default async function BusinessesPage(){const data=await getBusinessDashboard();return <DashboardShell kind="business" active="businesses" metrics={data.metrics} workspaceName={data.workspaceName} userName={data.userName} title="Businesses"><section className="panel activity"><DashboardPageIntro eyebrow="Workspace listings" title="Your business profiles" description="Keep every listing accurate for residents browsing the mobile app."/>{data.businesses.length?data.businesses.map(b=><div className="business-row" key={b.id}><div className="avatar">{b.name.slice(0,2).toUpperCase()}</div><b>{b.name}</b><span className="status">{"status" in b?String(b.status):"published"}</span><small>{"category" in b?String(b.category):"Local"}</small><Link className="text-action" href={`/business/businesses/${b.id}/edit`}>Edit profile</Link></div>):<EmptyState title="No businesses yet" description="A chamber invitation or platform administrator can connect a business to this account."/>}</section></DashboardShell>}

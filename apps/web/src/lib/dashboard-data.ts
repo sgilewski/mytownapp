@@ -4,13 +4,13 @@ import { requireRole } from "@/lib/auth";
 
 export async function getBusinessDashboard() {
   const auth=await requireRole(["business_admin","business_editor","platform_admin"]);
-  if(auth.demo)return{metrics:demoBusinessMetrics,businesses:demoBusinesses,offers:demoOffers,isDemo:true,workspaceName:"Birch & Main",userName:"Maya"};
+  if(auth.demo)return{metrics:demoBusinessMetrics,businesses:demoBusinesses,offers:demoOffers,redemptions:[],memberships:[],isDemo:true,workspaceName:"Birch & Main",userName:"Maya"};
   const isPlatformAdmin=auth.memberships.some(m=>m.role==="platform_admin");
   const businessIds=auth.memberships.map(m=>m.business_id).filter((id):id is string=>Boolean(id));
   const businessesQuery=auth.supabase.from("businesses").select("id,name,town_id,category,description,address,status");
   const offersQuery=auth.supabase.from("offers").select("id,business_id,title,description,status,starts_at,ends_at").order("created_at",{ascending:false});
   const favoritesQuery=auth.supabase.from("business_favorites").select("business_id");
-  const redemptionsQuery=auth.supabase.from("redemptions").select("id,offer_id,offers!inner(business_id)");
+  const redemptionsQuery=auth.supabase.from("redemptions").select("id,offer_id,redeemed_at,offers!inner(title,business_id)").order("redeemed_at",{ascending:false});
   const results=await Promise.all([
     isPlatformAdmin?businessesQuery:businessesQuery.in("id",businessIds),
     isPlatformAdmin?offersQuery:offersQuery.in("business_id",businessIds),
@@ -27,12 +27,12 @@ export async function getBusinessDashboard() {
     {label:"Redemptions",value:String(redemptions?.length??0),change:"all time",trend:"neutral"},
     {label:"Favorites",value:String(favorites?.length??0),change:"all time",trend:"neutral"}
   ];
-  return{metrics,businesses:businesses??[],offers:offers??[],isDemo:false,workspaceName:isPlatformAdmin?"All businesses":businesses?.[0]?.name??"Business workspace",userName:auth.userName};
+  return{metrics,businesses:businesses??[],offers:offers??[],redemptions:redemptions??[],memberships:auth.memberships,isDemo:false,workspaceName:isPlatformAdmin?"All businesses":businesses?.[0]?.name??"Business workspace",userName:auth.userName};
 }
 
 export async function getChamberDashboard(){
   const auth=await requireRole(["chamber_admin","chamber_editor","platform_admin"]);
-  if(auth.demo)return{metrics:demoChamberMetrics,businesses:demoBusinesses,events:demoEvents,invitations:[],announcements:[],chamberId:"c1",isDemo:true,workspaceName:"Hillside Chamber",userName:"Alex"};
+  if(auth.demo)return{metrics:demoChamberMetrics,businesses:demoBusinesses,events:demoEvents,invitations:[],announcements:[],chambers:[{id:"c1",name:"Hillside Chamber",town_id:"t1"}],memberships:[],chamberId:"c1",isDemo:true,workspaceName:"Hillside Chamber",userName:"Alex"};
   const isPlatformAdmin=auth.memberships.some(m=>m.role==="platform_admin");
   const chamberIds=auth.memberships.map(m=>m.chamber_id).filter((id):id is string=>Boolean(id));
   const chambersQuery=auth.supabase.from("chambers").select("id,town_id,name");
@@ -57,5 +57,5 @@ export async function getChamberDashboard(){
     {label:"Pending invites",value:String((invitations??[]).filter(i=>i.status==="pending").length),change:"awaiting response",trend:"neutral"},
     {label:"Announcements",value:String((announcements??[]).filter(a=>a.status==="published").length),change:"currently published",trend:"neutral"}
   ];
-  return{metrics,businesses:businesses??[],events:events??[],invitations:invitations??[],announcements:announcements??[],chamberId:chambers?.[0]?.id??"",isDemo:false,workspaceName:isPlatformAdmin?"All chambers":chambers?.[0]?.name??"Chamber workspace",userName:auth.userName};
+  return{metrics,businesses:businesses??[],events:events??[],invitations:invitations??[],announcements:announcements??[],chambers:chambers??[],memberships:auth.memberships,chamberId:chambers?.[0]?.id??"",isDemo:false,workspaceName:isPlatformAdmin?"All chambers":chambers?.[0]?.name??"Chamber workspace",userName:auth.userName};
 }

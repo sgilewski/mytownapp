@@ -1,0 +1,5 @@
+import { DashboardShell } from "@/components/dashboard";
+import { DashboardPageIntro,EmptyState,RolePill } from "@/components/dashboard-list";
+import { getBusinessDashboard } from "@/lib/dashboard-data";
+
+export default async function BusinessTeamPage(){const data=await getBusinessDashboard();return <DashboardShell kind="business" active="team" metrics={[]} workspaceName={data.workspaceName} userName={data.userName} title="Team"><section className="panel activity"><DashboardPageIntro eyebrow="Access" title="Workspace roles" description="Roles control which dashboards and business records each person can manage."/>{data.memberships.length?data.memberships.map((m,index)=><div className="business-row" key={`${m.role}-${index}`}><div className="avatar">{data.userName.slice(0,2).toUpperCase()}</div><b>{data.userName}</b><RolePill role={m.role}/><small>{m.business_id?"Business access":"Global access"}</small></div>):<EmptyState title="Demo account" description="Team members will appear after this workspace is connected to Supabase."/>}</section></DashboardShell>}
