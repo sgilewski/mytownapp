@@ -6,8 +6,8 @@ import { StatusAction } from "@/components/status-action";
 import { getBusinessDashboard } from "@/lib/dashboard-data";
 
 export default async function BusinessDashboard(){
-  const {metrics,businesses,offers,isDemo}=await getBusinessDashboard();
-  return <DashboardShell kind="business" metrics={metrics}>
+  const {metrics,businesses,offers,isDemo,workspaceName,userName}=await getBusinessDashboard();
+  return <DashboardShell kind="business" metrics={metrics} workspaceName={workspaceName} userName={userName}>
     <section className="panel activity"><div className="panel-heading"><div><p className="eyebrow">Your businesses</p><h2>{isDemo?"A clear view of local momentum":"Workspace listings"}</h2></div><Link className="secondary" href="/business/offers/new"><Plus size={16}/> New offer</Link></div>
       {businesses.length?businesses.map(b=><div className="business-row" key={b.id}><div className="avatar">{b.name.split(" ").map((x:string)=>x[0]).join("").slice(0,2)}</div><b>{b.name}</b><span className="status">{"status" in b?String(b.status):"published"}</span><small>{"category" in b?String(b.category):""}</small><Link className="text-action" href={`/business/businesses/${b.id}/edit`}>Edit profile</Link></div>):<p className="empty-copy">No businesses are connected to this account yet.</p>}
     </section>
