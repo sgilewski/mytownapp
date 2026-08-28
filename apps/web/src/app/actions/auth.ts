@@ -1,6 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getPostAuthDestination } from "@/lib/workspace-access";
 
 function appUrl() {
   const configured = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
@@ -16,9 +17,7 @@ export async function signIn(formData:FormData){
   if(error)redirect(`/login?error=${encodeURIComponent(error.message)}`);
   const{data:memberships,error:membershipError}=await supabase.from("memberships").select("role").eq("user_id",data.user.id);
   if(membershipError)redirect(`/login?error=${encodeURIComponent("Signed in, but account roles could not be loaded")}`);
-  if(memberships?.some(m=>m.role==="platform_admin"||m.role==="business_admin"||m.role==="business_editor"))redirect("/business");
-  if(memberships?.some(m=>m.role==="chamber_admin"||m.role==="chamber_editor"))redirect("/chamber");
-  redirect("/unauthorized");
+  redirect(getPostAuthDestination(memberships??[]));
 }
 export async function requestPasswordReset(formData:FormData){
   const supabase=await createClient();
@@ -42,5 +41,19 @@ export async function updatePassword(formData:FormData){
   await supabase.auth.signOut();
   redirect("/login?message=Password+updated.+You+can+sign+in+now.");
 }
-export async function signUp(formData:FormData){const supabase=await createClient();if(!supabase)redirect("/signup?error=Supabase+is+not+configured");const email=String(formData.get("email")??"").trim().toLowerCase();const password=String(formData.get("password")??"");const fullName=String(formData.get("fullName")??"").trim();const{data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:fullName}}});if(error)redirect(`/signup?error=${encodeURIComponent(error.message)}`);if(data.session)redirect("/business");redirect("/login?message=Check+your+email+to+confirm+your+account")}
+export async function signUp(formData:FormData){
+  const supabase=await createClient();
+  if(!supabase)redirect("/signup?error=Supabase+is+not+configured");
+  const email=String(formData.get("email")??"").trim().toLowerCase();
+  const password=String(formData.get("password")??"");
+  const fullName=String(formData.get("fullName")??"").trim();
+  const{data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:fullName}}});
+  if(error)redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+  if(data.session&&data.user){
+    const{data:memberships,error:membershipError}=await supabase.from("memberships").select("role").eq("user_id",data.user.id);
+    if(membershipError)redirect(`/login?error=${encodeURIComponent("Account created, but roles could not be loaded")}`);
+    redirect(getPostAuthDestination(memberships??[]));
+  }
+  redirect("/login?message=Check+your+email+to+confirm+your+account");
+}
 export async function signOut(){const supabase=await createClient();if(supabase)await supabase.auth.signOut();redirect("/login")}
