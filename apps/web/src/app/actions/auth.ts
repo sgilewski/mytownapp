@@ -5,10 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 import { getPostAuthDestination } from "@/lib/workspace-access";
 
 function appUrl() {
+  const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+  if (vercelHost) {
+    return `https://${vercelHost.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
+  }
   const configured = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
   if (configured) return configured;
-  const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  return vercelUrl ? `https://${vercelUrl}` : "http://localhost:3000";
+  return "http://localhost:3000";
 }
 
 export async function signIn(formData:FormData){
