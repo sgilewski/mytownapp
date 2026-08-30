@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { updatePassword } from "@/app/actions/auth";
 import { createClient } from "@/lib/supabase/server";
+import { PasswordField } from "@/components/password-field";
 
 export default async function ResetPassword({searchParams}:{searchParams:Promise<{error?:string}>}){
   const{error}=await searchParams;
@@ -14,8 +15,8 @@ export default async function ResetPassword({searchParams}:{searchParams:Promise
     <p className="eyebrow">Account recovery</p><h1>Choose a new password.</h1>
     <p className="form-copy">Use at least eight characters and confirm it below.</p>
     {error?<p className="form-error">{error}</p>:null}
-    <label>New password<input name="password" type="password" autoComplete="new-password" minLength={8} required/></label>
-    <label>Confirm password<input name="confirmation" type="password" autoComplete="new-password" minLength={8} required/></label>
+    <PasswordField label="New password" name="password" autoComplete="new-password"/>
+    <PasswordField label="Confirm password" name="confirmation" autoComplete="new-password"/>
     <button className="primary" type="submit">Update password</button>
   </form></main>;
 }
