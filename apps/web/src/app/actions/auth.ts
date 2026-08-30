@@ -71,7 +71,7 @@ export async function signUp(formData:FormData){
     if(membershipError)redirect(`/login?error=${encodeURIComponent("Account created, but roles could not be loaded")}`);
     redirect(getPostAuthDestination(memberships??[]));
   }
-  redirect("/login?message=Check+your+email+to+confirm+your+account");
+  redirect(`/check-email?email=${encodeURIComponent(email)}`);
 }
 export async function signOut(){const supabase=await createClient();if(supabase)await supabase.auth.signOut();redirect("/login")}
 
