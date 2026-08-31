@@ -14,7 +14,7 @@ export default async function ChamberDashboard(){
       </section></div>
     <section className="panel activity"><div className="panel-heading"><div><p className="eyebrow">Business network</p><h2>Participation and invitations</h2></div></div>
       {businesses.map(b=><div className="business-row" key={b.id}><div className="avatar">{b.name.split(" ").map((x:string)=>x[0]).join("").slice(0,2)}</div><b>{b.name}</b><span className="status">{"status" in b?String(b.status):"published"}</span><small>Business</small></div>)}
-      {invitations.map(i=><div className="business-row" key={i.id}><div className="avatar">@</div><b>{i.email}</b><span className="status pending">{i.status}</span><small>Invitation</small></div>)}
+      {invitations.map(i=>{const business=Array.isArray(i.businesses)?i.businesses[0]:i.businesses;const name=business?.name??"Business invitation";return <div className="business-row" key={i.id}><div className="avatar">{name.split(" ").map((part:string)=>part[0]).join("").slice(0,2).toUpperCase()}</div><b>{name}</b><span className="status pending">{i.status}</span><small>Business invite</small></div>})}
       {!businesses.length&&!invitations.length?<p className="empty-copy">Invite the first business to join this town.</p>:null}
     </section>
     <section className="panel activity" id="announcements"><div className="panel-heading"><div><p className="eyebrow">Town updates</p><h2>Announcements</h2></div><Link className="secondary" href="/chamber/announcements/new"><Megaphone size={16}/> New announcement</Link></div>
