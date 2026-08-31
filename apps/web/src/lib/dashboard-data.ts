@@ -37,7 +37,7 @@ export async function getChamberDashboard(){
   const chamberIds=auth.memberships.map(m=>m.chamber_id).filter((id):id is string=>Boolean(id));
   const chambersQuery=auth.supabase.from("chambers").select("id,town_id,name");
   const eventsQuery=auth.supabase.from("events").select("id,title,venue,starts_at,status,chamber_id").order("starts_at");
-  const invitationsQuery=auth.supabase.from("invitations").select("id,email,status,created_at,chamber_id").order("created_at",{ascending:false});
+  const invitationsQuery=auth.supabase.from("invitations").select("id,status,created_at,chamber_id,business_id,businesses(name)").not("business_id","is",null).order("created_at",{ascending:false});
   const announcementsQuery=auth.supabase.from("announcements").select("id,title,status,starts_at,ends_at,chamber_id").order("created_at",{ascending:false});
   const results=await Promise.all([
     isPlatformAdmin?chambersQuery:chambersQuery.in("id",chamberIds),
