@@ -49,7 +49,7 @@ export async function getChamberDashboard(){
   if(firstError)throw new Error(`Unable to load chamber dashboard: ${firstError.message}`);
   const [{data:chambers},{data:events},{data:invitations},{data:announcements}]=results;
   const townIds=(chambers??[]).map(c=>c.town_id);
-  const {data:businesses,error:businessError}=townIds.length?await auth.supabase.from("businesses").select("id,name,status,town_id").in("town_id",townIds):{data:[],error:null};
+  const {data:businesses,error:businessError}=townIds.length?await auth.supabase.from("businesses").select("id,name,status,town_id,created_at").in("town_id",townIds).order("created_at",{ascending:false}):{data:[],error:null};
   if(businessError)throw new Error(`Unable to load chamber businesses: ${businessError.message}`);
   const metrics:DashboardMetric[]=[
     {label:"Businesses",value:String(businesses?.length??0),change:"in chamber towns",trend:"neutral"},
