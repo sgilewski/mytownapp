@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request:NextRequest){
   const code=request.nextUrl.searchParams.get("code");
+  const requestedEmail=request.nextUrl.searchParams.get("email")?.trim().toLowerCase()??"";
+  const email=requestedEmail.length<=254&&requestedEmail.includes("@")?requestedEmail:"";
   const requestedNext=request.nextUrl.searchParams.get("next");
   const next=requestedNext==="/reset-password"?requestedNext:null;
   if(code){
@@ -12,12 +14,17 @@ export async function GET(request:NextRequest){
       if(!error){
         if(next)return NextResponse.redirect(new URL(next,request.url));
         await supabase.auth.signOut();
-        return NextResponse.redirect(new URL("/login?message=Email+confirmed.+You+can+sign+in+now.",request.url));
+        const loginUrl=new URL("/login",request.url);
+        loginUrl.searchParams.set("message","Email confirmed. You can sign in now.");
+        if(email)loginUrl.searchParams.set("email",email);
+        return NextResponse.redirect(loginUrl);
       }
     }
   }
   const errorPath=next
     ?"/forgot-password?error=That+reset+link+is+invalid+or+has+expired"
     :"/login?message=Your+email+is+confirmed.+Sign+in+to+continue.";
-  return NextResponse.redirect(new URL(errorPath,request.url));
+  const errorUrl=new URL(errorPath,request.url);
+  if(email&&!next)errorUrl.searchParams.set("email",email);
+  return NextResponse.redirect(errorUrl);
 }
