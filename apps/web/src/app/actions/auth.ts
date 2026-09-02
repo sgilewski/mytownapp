@@ -64,7 +64,9 @@ export async function signUp(formData:FormData){
   if(fullName.length<2)redirect(`${signupUrl}&error=Please+enter+your+full+name`);
   if(password.length<8)redirect(`${signupUrl}&error=Password+must+be+at+least+8+characters`);
   if(password!==confirmation)redirect(`${signupUrl}&error=Passwords+do+not+match`);
-  const{data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:fullName,invitation_token_hash:tokenHash},emailRedirectTo:`${appUrl()}/auth/callback`}});
+  const confirmationUrl=new URL("/auth/callback",appUrl());
+  confirmationUrl.searchParams.set("email",email);
+  const{data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:fullName,invitation_token_hash:tokenHash},emailRedirectTo:confirmationUrl.toString()}});
   if(error)redirect(`${signupUrl}&error=${encodeURIComponent(error.message)}`);
   if(data.session&&data.user){
     const{data:memberships,error:membershipError}=await supabase.from("memberships").select("role").eq("user_id",data.user.id);
