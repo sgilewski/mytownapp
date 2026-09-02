@@ -18,6 +18,6 @@ export async function GET(request:NextRequest){
   }
   const errorPath=next
     ?"/forgot-password?error=That+reset+link+is+invalid+or+has+expired"
-    :"/login?message=Your+email+may+already+be+confirmed.+Try+signing+in.";
+    :"/login?message=Your+email+is+confirmed.+Sign+in+to+continue.";
   return NextResponse.redirect(new URL(errorPath,request.url));
 }
